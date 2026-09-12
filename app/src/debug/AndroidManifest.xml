@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-build-only override: allows plain http:// traffic (no TLS) so the app
+  can talk to the local dev backend (uvicorn on a LAN IP, no SSL cert).
+  Only merges into debug builds - release builds are unaffected and stay
+  locked down to HTTPS, since this LAN IP is dev-only and changes constantly.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:usesCleartextTraffic="true" />
+</manifest>
