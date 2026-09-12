@@ -1,0 +1,544 @@
+[
+  {
+    "id": 1,
+    "text": "just finished my morning run, feeling great today!",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 62.7,
+    "reason": null
+  },
+  {
+    "id": 2,
+    "text": "grabbed coffee with an old friend, good talk",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 74.4,
+    "reason": null
+  },
+  {
+    "id": 3,
+    "text": "just got the internship offer!! so happy right now",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=1",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 63.3,
+    "reason": null
+  },
+  {
+    "id": 4,
+    "text": "sunset walk cleared my head completely",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 85.2,
+    "reason": null
+  },
+  {
+    "id": 5,
+    "text": "my dog learned a new trick today, so proud",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 56.8,
+    "reason": null
+  },
+  {
+    "id": 6,
+    "text": "finally cleaned my whole room, feels amazing",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=2",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 81.3,
+    "reason": null
+  },
+  {
+    "id": 7,
+    "text": "best pizza i've had in months, 10/10",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 84.7,
+    "reason": null
+  },
+  {
+    "id": 8,
+    "text": "weekend trip to the mountains was incredible",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 80.0,
+    "reason": null
+  },
+  {
+    "id": 9,
+    "text": "passed my driving test on the first try!",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=3",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 70.4,
+    "reason": null
+  },
+  {
+    "id": 10,
+    "text": "made my grandma laugh so hard today",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 77.5,
+    "reason": null
+  },
+  {
+    "id": 11,
+    "text": "new plant babies arrived, so excited to repot them",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 82.9,
+    "reason": null
+  },
+  {
+    "id": 12,
+    "text": "concert last night was unreal, best show ever",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=4",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 63.0,
+    "reason": null
+  },
+  {
+    "id": 13,
+    "text": "got a handwritten letter from my best friend today",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 72.3,
+    "reason": null
+  },
+  {
+    "id": 14,
+    "text": "finished the marathon, still can't believe it",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 69.4,
+    "reason": null
+  },
+  {
+    "id": 15,
+    "text": "surprise birthday party they threw for me was so sweet",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=5",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 64.4,
+    "reason": null
+  },
+  {
+    "id": 16,
+    "text": "have a nice day",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 9.7,
+    "reason": null
+  },
+  {
+    "id": 17,
+    "text": "does anyone know a good recipe for dal",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 20.4,
+    "reason": null
+  },
+  {
+    "id": 18,
+    "text": "what time does the library close on sundays",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=6",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 9.9,
+    "reason": null
+  },
+  {
+    "id": 19,
+    "text": "switching my phone plan, any recommendations",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 16.1,
+    "reason": null
+  },
+  {
+    "id": 20,
+    "text": "does this bus route go through the market",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 14.6,
+    "reason": null
+  },
+  {
+    "id": 21,
+    "text": "looking for a good podcast for long drives",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=7",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 16.5,
+    "reason": null
+  },
+  {
+    "id": 22,
+    "text": "anyone know a decent plumber nearby",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 3.7,
+    "reason": null
+  },
+  {
+    "id": 23,
+    "text": "trying to find a recipe using leftover rice",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -2.0,
+    "reason": null
+  },
+  {
+    "id": 24,
+    "text": "what's a good beginner book on economics",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=8",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 18.0,
+    "reason": null
+  },
+  {
+    "id": 25,
+    "text": "does anyone have notes from today's lecture",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 19.0,
+    "reason": null
+  },
+  {
+    "id": 26,
+    "text": "feeling kind of low today, not sure why",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -65.6,
+    "reason": null
+  },
+  {
+    "id": 27,
+    "text": "missing home more than usual this week",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=9",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -45.6,
+    "reason": null
+  },
+  {
+    "id": 28,
+    "text": "the pressure this semester is honestly unbearable",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -49.2,
+    "reason": null
+  },
+  {
+    "id": 29,
+    "text": "haven't been sleeping well, everything feels heavier lately",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -56.2,
+    "reason": null
+  },
+  {
+    "id": 30,
+    "text": "lost touch with a friend and it's bothering me",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=10",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -57.3,
+    "reason": null
+  },
+  {
+    "id": 31,
+    "text": "didn't get the result i was hoping for, kind of gutted",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -53.0,
+    "reason": null
+  },
+  {
+    "id": 32,
+    "text": "exams are close and i just feel numb about it",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -55.3,
+    "reason": null
+  },
+  {
+    "id": 33,
+    "text": "this traffic is such bullshit honestly",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=11",
+      "extracted_text": ""
+    },
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": -31.1,
+    "reason": null
+  },
+  {
+    "id": 34,
+    "text": "you're all idiots and this app is trash",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "insult"
+    ],
+    "wellbeing_score": -43.7,
+    "reason": null
+  },
+  {
+    "id": 35,
+    "text": "wow you're actually pathetic lol",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "insult"
+    ],
+    "wellbeing_score": -56.5,
+    "reason": null
+  },
+  {
+    "id": 36,
+    "text": "you motherfucker son of a bitch",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=12",
+      "extracted_text": ""
+    },
+    "should_blur": true,
+    "tags": [
+      "toxic",
+      "insult"
+    ],
+    "wellbeing_score": -67.5,
+    "reason": null
+  },
+  {
+    "id": 37,
+    "text": "shut up you absolute clown, nobody asked",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "insult"
+    ],
+    "wellbeing_score": -55.4,
+    "reason": null
+  },
+  {
+    "id": 38,
+    "text": "you're worthless and everyone thinks so",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "insult"
+    ],
+    "wellbeing_score": -49.6,
+    "reason": null
+  },
+  {
+    "id": 39,
+    "text": "get lost you disgusting waste of space",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=13",
+      "extracted_text": ""
+    },
+    "should_blur": true,
+    "tags": [
+      "insult"
+    ],
+    "wellbeing_score": -46.0,
+    "reason": null
+  },
+  {
+    "id": 40,
+    "text": "i will find you and make you pay for this",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "threat",
+      "toxic"
+    ],
+    "wellbeing_score": -80.7,
+    "reason": null
+  },
+  {
+    "id": 41,
+    "text": "watch your back, you have no idea what's coming",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "threat",
+      "toxic"
+    ],
+    "wellbeing_score": -84.2,
+    "reason": null
+  },
+  {
+    "id": 42,
+    "text": "say that again and see what happens to you",
+    "media": {
+      "type": "image",
+      "url": "https://picsum.photos/400/300?random=14",
+      "extracted_text": ""
+    },
+    "should_blur": true,
+    "tags": [
+      "threat",
+      "toxic"
+    ],
+    "wellbeing_score": -75.5,
+    "reason": null
+  },
+  {
+    "id": 43,
+    "text": "post about a blocked topic",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "user-blocked"
+    ],
+    "wellbeing_score": null,
+    "reason": "exact_match"
+  },
+  {
+    "id": 44,
+    "text": "another post about the blocked topic here",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "user-blocked"
+    ],
+    "wellbeing_score": null,
+    "reason": "exact_match"
+  },
+  {
+    "id": 45,
+    "text": "can't stop talking about the blocked subject today",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "user-blocked"
+    ],
+    "wellbeing_score": null,
+    "reason": "exact_match"
+  },
+  {
+    "id": 46,
+    "text": "cricet match ws lit today, huge win",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "user-blocked"
+    ],
+    "wellbeing_score": null,
+    "reason": "fuzzy_match:cricket"
+  },
+  {
+    "id": 47,
+    "text": "cricekt scores were insane last nite",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "user-blocked"
+    ],
+    "wellbeing_score": null,
+    "reason": "fuzzy_match:cricket"
+  },
+  {
+    "id": 48,
+    "text": "exam stress is honestly at an all time high rn",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "user-blocked"
+    ],
+    "wellbeing_score": null,
+    "reason": "similarity_match:exam stress"
+  },
+  {
+    "id": 49,
+    "text": "the coursework deadlines this week are crushing me",
+    "media": null,
+    "should_blur": true,
+    "tags": [
+      "user-blocked"
+    ],
+    "wellbeing_score": null,
+    "reason": "similarity_match:exam stress"
+  },
+  {
+    "id": 50,
+    "text": "rainy days always make me want to nap all afternoon",
+    "media": null,
+    "should_blur": false,
+    "tags": [],
+    "wellbeing_score": 64.9,
+    "reason": null
+  }
+]
