@@ -1,1 +1,237 @@
-// stub: single post card, shows blur/tags/wellbeing_score once classified
+package com.example.distll.ui.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.distll.data.model.ClassificationResult
+import com.example.distll.data.model.Post
+import com.example.feedit.ui.theme.FeedITTheme
+import com.example.feedit.ui.theme.LocalAppColors
+
+/** One post in the feed: its text (actually blurred + tap-to-reveal if flagged), tag chips, wellbeing/blocked status, and a like/comment/share row. */
+@Composable
+fun PostCard(
+    post: Post,
+    result: ClassificationResult,
+    modifier: Modifier = Modifier,
+) {
+    var revealed by rememberSaveable(post.id) { mutableStateOf(false) }
+    val isHidden = result.shouldBlur && !revealed
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = LocalAppColors.current.surface),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = post.text,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = LocalAppColors.current.textPrimary,
+                    // NOTE: Modifier.blur() only renders on API 31+. Below that
+                    // this text stays fully readable - there's no opaque
+                    // fallback here on purpose, per design. minSdk is 27.
+                    modifier = if (isHidden) Modifier.blur(14.dp) else Modifier,
+                )
+
+                if (isHidden) {
+                    Text(
+                        text = "Tap to reveal",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.White,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .clip(RoundedCornerShape(50))
+                            .background(LocalAppColors.current.bottomNavBar)
+                            .clickable { revealed = true }
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                    )
+                }
+            }
+
+            if (result.tags.isNotEmpty() || result.wellbeingScore != null || result.shouldBlur) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        result.tags.forEach { tag -> TagChip(tag) }
+                    }
+
+                    if (result.wellbeingScore != null) {
+                        WellbeingLabel(result.wellbeingScore)
+                    } else if (result.shouldBlur) {
+                        Text(
+                            text = "blocked by your settings",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = LocalAppColors.current.textSecondary,
+                        )
+                    }
+                }
+            }
+
+            PostActionsRow(modifier = Modifier.padding(top = 12.dp))
+        }
+    }
+}
+
+@Composable
+private fun TagChip(tag: String) {
+    val tint = when (tag) {
+        "user-blocked" -> LocalAppColors.current.textSecondary
+        "joy" -> LocalAppColors.current.wellbeingPositive
+        else -> LocalAppColors.current.wellbeingNegative
+    }
+    Text(
+        text = tag,
+        style = MaterialTheme.typography.labelSmall,
+        color = tint,
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(tint.copy(alpha = 0.15f))
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+    )
+}
+
+@Composable
+private fun WellbeingLabel(score: Double) {
+    Row {
+        Text(
+            text = "wellbeing ",
+            style = MaterialTheme.typography.labelSmall,
+            color = LocalAppColors.current.textSecondary,
+        )
+        Text(
+            text = formatWellbeing(score),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = LocalAppColors.current.textPrimary,
+        )
+    }
+}
+
+private fun formatWellbeing(score: Double): String {
+    val rounded = kotlin.math.round(score * 10) / 10.0
+    val body = if (rounded == rounded.toLong().toDouble()) rounded.toLong().toString() else rounded.toString()
+    return if (rounded >= 0) "+$body" else body
+}
+
+// Aesthetic only, for now: Like toggles a local visual state; Comment and
+// Share are no-ops (no comment feature, no real share sheet) - just the
+// icons, as requested.
+@Composable
+private fun PostActionsRow(modifier: Modifier = Modifier) {
+    var liked by rememberSaveable { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        IconButton(onClick = { liked = !liked }) {
+            Icon(
+                imageVector = if (liked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = if (liked) "Unlike" else "Like",
+                tint = if (liked) LocalAppColors.current.wellbeingNegative else LocalAppColors.current.textSecondary,
+            )
+        }
+        IconButton(onClick = { /* comments not implemented yet */ }) {
+            Icon(
+                imageVector = Icons.Outlined.ChatBubbleOutline,
+                contentDescription = "Comment",
+                tint = LocalAppColors.current.textSecondary,
+            )
+        }
+        IconButton(onClick = { /* sharing not implemented - aesthetic only, for now */ }) {
+            Icon(
+                imageVector = Icons.Outlined.Share,
+                contentDescription = "Share",
+                tint = LocalAppColors.current.textSecondary,
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Positive")
+@Composable
+private fun PostCardPreview() {
+    FeedITTheme(dynamicColor = false) {
+        PostCard(
+            post = Post(id = "p1", text = "have a nice day"),
+            result = ClassificationResult(
+                postId = "p1",
+                shouldBlur = false,
+                tags = emptyList(),
+                wellbeingScore = 71.0,
+                reason = null,
+            ),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Blurred - tap to reveal")
+@Composable
+private fun PostCardBlurredPreview() {
+    FeedITTheme(dynamicColor = false) {
+        PostCard(
+            post = Post(id = "p2", text = "exam stress is really getting to me this week"),
+            result = ClassificationResult(
+                postId = "p2",
+                shouldBlur = true,
+                tags = listOf("toxic", "insult"),
+                wellbeingScore = -62.5,
+                reason = "similarity_match:exam stress",
+            ),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "User-blocked")
+@Composable
+private fun PostCardBlockedPreview() {
+    FeedITTheme(dynamicColor = false) {
+        PostCard(
+            post = Post(id = "p3", text = "IPL cricket match tonight was intense"),
+            result = ClassificationResult(
+                postId = "p3",
+                shouldBlur = true,
+                tags = listOf("user-blocked"),
+                wellbeingScore = null,
+                reason = "exact_match",
+            ),
+        )
+    }
+}

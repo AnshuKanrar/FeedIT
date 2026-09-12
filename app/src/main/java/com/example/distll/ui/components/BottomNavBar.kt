@@ -24,7 +24,6 @@ import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,15 +37,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.distll.navigation.Routes
 import com.example.feedit.ui.theme.FeedITTheme
+import com.example.feedit.ui.theme.LocalAppColors
 
 enum class NavigationContents(
     val icon: ImageVector,
-    val title: String
+    val title: String,
+    val route: String,
 ) {
-    HOME(Icons.Outlined.Home, "Home"),
-    ANALYSIS(Icons.Outlined.Analytics, "Analysis"),
-    SETTINGS(Icons.Outlined.Settings, "Settings"),
+    HOME(Icons.Outlined.Home, "Home", Routes.HOME),
+    ANALYSIS(Icons.Outlined.Analytics, "Analysis", Routes.ANALYSIS),
+    SETTINGS(Icons.Outlined.Settings, "Settings", Routes.SETTINGS),
 }
 
 @Composable
@@ -75,7 +77,7 @@ fun BottomNavBar(
                         bottomEnd = 36.dp
                     )
                 )
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(LocalAppColors.current.bottomNavBar)
         )
         Row(
             modifier = Modifier
@@ -113,12 +115,12 @@ fun NavigationItem(
     )
 
     val borderOpacity by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.background else Color.Transparent,
+        targetValue = if (isSelected) LocalAppColors.current.background else Color.Transparent,
         label = "Border ring Animation"
     )
 
     val bgColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+        targetValue = if (isSelected) LocalAppColors.current.bottomNavButtonColor else Color.Transparent,
         label = "Button Background Color Animation"
     )
 
@@ -150,9 +152,9 @@ fun NavigationItem(
                 .size(30.dp),
 
             tint = if (isSelected) {
-                MaterialTheme.colorScheme.background
+                LocalAppColors.current.background
             } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
+                LocalAppColors.current.textSecondary
             }
         )
     }
@@ -168,7 +170,7 @@ fun BottomNavBarPreview() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(LocalAppColors.current.background),
             contentAlignment = Alignment.BottomCenter
         ) {
             BottomNavBar(

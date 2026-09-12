@@ -22,3 +22,19 @@ class ClassifyResult(BaseModel):
     tags: List[str]
     wellbeing_score: Optional[float] = None
     reason: Optional[str] = None
+
+
+class MoodHistoryPoint(BaseModel):
+    t: float
+    valence: float
+    arousal: float
+
+
+class MoodResponse(BaseModel):
+    mood: str
+    valence: float
+    arousal: float
+    confidence: float
+    trend: str
+    session_minutes: float
+    history: List[MoodHistoryPoint]
