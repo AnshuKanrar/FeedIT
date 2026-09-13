@@ -63,11 +63,16 @@ matched pair and must always be loaded from the same training run.
 
 ## Mocked login
 
-Tapping "Connect Reddit" or "Connect YouTube" in the Android app only
-flips a local `connected` flag in `MockAuthManager`. There is no real
-OAuth flow, no network call, and no token exchange. `TokenStore` exists
-to hold a fake/local token shape so the rest of the app can be wired
+Tapping "Connect Reddit" or "Connect Instagram" (on the login screen or
+Profile) only flips a local `connected` flag in `MockAuthManager`. There
+is no real OAuth flow, no network call, and no token exchange. `TokenStore`
+exists to hold a fake/local token shape so the rest of the app can be wired
 against a stable interface, not to talk to a real auth server.
+
+The login screen itself is a one-time entry point (start destination of the
+nav graph): entering a name and tapping Continue sets `UserSession.displayName`
+(shown on Profile) and pops the login route off the back stack for good -
+navigation from there on is Home/Analysis/Settings/Profile only.
 
 ## Fallback demo (separate, untouched, not part of the live flow)
 

@@ -4,13 +4,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.distll.auth.UserSession
+import com.example.distll.settings.SettingsStore
 import com.example.distll.ui.components.BottomNavBar
 import com.example.distll.ui.components.NavigationContents
 import com.example.distll.ui.components.TopHeaderBar
@@ -32,32 +36,48 @@ private const val TEMPORARY_USER_ID = "demo-user"
  */
 @Composable
 fun FeedITApp() {
+    val context = LocalContext.current
+    // Restored once per process, synchronously, before the nav graph is
+    // even built - so a returning user's start destination is correct on
+    // the very first frame, never a flash of the login screen.
+    val startDestination = remember {
+        UserSession.restore(context)
+        SettingsStore.restore(context)
+        if (UserSession.isLoggedIn) Routes.HOME else Routes.LOGIN
+    }
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val isLoginScreen = currentDestination?.route == Routes.LOGIN
 
     Scaffold(
         topBar = {
-            TopHeaderBar(
-                onProfileClick = {
-                    navController.navigate(Routes.PROFILE) { launchSingleTop = true }
-                }
-            )
+            if (!isLoginScreen) {
+                TopHeaderBar(
+                    onProfileClick = {
+                        navController.navigate(Routes.PROFILE) { launchSingleTop = true }
+                    }
+                )
+            }
         },
         bottomBar = {
-            val selectedTab = NavigationContents.entries.find { tab ->
-                currentDestination?.hierarchy?.any { it.route == tab.route } == true
-            } ?: NavigationContents.HOME
+            if (!isLoginScreen) {
+                val selectedTab = NavigationContents.entries.find { tab ->
+                    currentDestination?.hierarchy?.any { it.route == tab.route } == true
+                } ?: NavigationContents.HOME
 
-            BottomNavBar(
-                selectedItem = selectedTab,
-                onItemSelected = { tab -> navController.navigateToTab(tab.route) },
-            )
+                BottomNavBar(
+                    selectedItem = selectedTab,
+                    onItemSelected = { tab -> navController.navigateToTab(tab.route) },
+                )
+            }
         },
     ) { innerPadding ->
         FeedITNavHost(
             navController = navController,
             userId = TEMPORARY_USER_ID,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding),
         )
     }

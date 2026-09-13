@@ -1,7 +1,7 @@
 package com.example.distll.auth
 
 /**
- * Flips a local "connected" flag for Reddit/YouTube - no real OAuth flow,
+ * Flips a local "connected" flag for Reddit/Instagram - no real OAuth flow,
  * no network call, no token exchange (see ARCHITECTURE.md "Mocked login").
  */
 object MockAuthManager {

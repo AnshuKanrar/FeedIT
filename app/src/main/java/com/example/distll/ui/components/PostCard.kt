@@ -7,8 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
@@ -33,20 +37,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.distll.data.model.ClassificationResult
-import com.example.distll.data.model.Post
+import com.example.distll.data.model.FeedPost
 import com.example.feedit.ui.theme.FeedITTheme
 import com.example.feedit.ui.theme.LocalAppColors
 
 /** One post in the feed: its text (actually blurred + tap-to-reveal if flagged), tag chips, wellbeing/blocked status, and a like/comment/share row. */
 @Composable
 fun PostCard(
-    post: Post,
-    result: ClassificationResult,
+    post: FeedPost,
     modifier: Modifier = Modifier,
 ) {
-    var revealed by rememberSaveable(post.id) { mutableStateOf(false) }
-    val isHidden = result.shouldBlur && !revealed
+    var revealed by rememberSaveable(post.postId) { mutableStateOf(false) }
+    val isHidden = post.shouldBlur && !revealed
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -55,15 +57,38 @@ fun PostCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Box(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = post.text,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = LocalAppColors.current.textPrimary,
-                    // NOTE: Modifier.blur() only renders on API 31+. Below that
-                    // this text stays fully readable - there's no opaque
-                    // fallback here on purpose, per design. minSdk is 27.
-                    modifier = if (isHidden) Modifier.blur(14.dp) else Modifier,
-                )
+                // NOTE: Modifier.blur() only renders on API 31+. Below that
+                // this content stays fully readable - there's no opaque
+                // fallback here on purpose, per design. minSdk is 27.
+                val contentModifier = if (isHidden) Modifier.blur(14.dp) else Modifier
+
+                Column(modifier = contentModifier) {
+                    post.imageUrl?.let { url ->
+                        AsyncImage(
+                            model = url,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 220.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                        )
+                    }
+                    val textTopPadding = if (post.imageUrl != null) Modifier.padding(top = 8.dp) else Modifier
+                    if (isHidden) {
+                        // Modifier.blur() reliably blurs images but not text
+                        // glyphs on every device/GPU - don't gamble on that
+                        // for actually hiding content. Redact it instead.
+                        RedactedTextPlaceholder(modifier = textTopPadding)
+                    } else {
+                        Text(
+                            text = post.text,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = LocalAppColors.current.textPrimary,
+                            modifier = textTopPadding,
+                        )
+                    }
+                }
 
                 if (isHidden) {
                     Text(
@@ -71,7 +96,7 @@ fun PostCard(
                         style = MaterialTheme.typography.labelLarge,
                         color = Color.White,
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
+                            .align(Alignment.Center)
                             .clip(RoundedCornerShape(50))
                             .background(LocalAppColors.current.bottomNavBar)
                             .clickable { revealed = true }
@@ -80,7 +105,7 @@ fun PostCard(
                 }
             }
 
-            if (result.tags.isNotEmpty() || result.wellbeingScore != null || result.shouldBlur) {
+            if (post.tags.isNotEmpty() || post.wellbeingScore != null || post.shouldBlur) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -89,12 +114,12 @@ fun PostCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        result.tags.forEach { tag -> TagChip(tag) }
+                        post.tags.forEach { tag -> TagChip(tag) }
                     }
 
-                    if (result.wellbeingScore != null) {
-                        WellbeingLabel(result.wellbeingScore)
-                    } else if (result.shouldBlur) {
+                    if (post.wellbeingScore != null) {
+                        WellbeingLabel(post.wellbeingScore)
+                    } else if (post.shouldBlur) {
                         Text(
                             text = "blocked by your settings",
                             style = MaterialTheme.typography.labelSmall,
@@ -106,6 +131,29 @@ fun PostCard(
 
             PostActionsRow(modifier = Modifier.padding(top = 12.dp))
         }
+    }
+}
+
+// Guaranteed-to-hide stand-in for real text: a couple of muted bars, the
+// standard "redacted content" look, so nothing about the real caption can
+// leak through regardless of whether blur renders correctly on this device.
+@Composable
+private fun RedactedTextPlaceholder(modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .height(14.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(LocalAppColors.current.textSecondary.copy(alpha = 0.3f)),
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.55f)
+                .height(14.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(LocalAppColors.current.textSecondary.copy(alpha = 0.3f)),
+        )
     }
 }
 
@@ -190,9 +238,10 @@ private fun PostActionsRow(modifier: Modifier = Modifier) {
 private fun PostCardPreview() {
     FeedITTheme(dynamicColor = false) {
         PostCard(
-            post = Post(id = "p1", text = "have a nice day"),
-            result = ClassificationResult(
+            post = FeedPost(
                 postId = "p1",
+                text = "have a nice day",
+                imageUrl = "https://picsum.photos/400/300?random=1",
                 shouldBlur = false,
                 tags = emptyList(),
                 wellbeingScore = 71.0,
@@ -207,9 +256,10 @@ private fun PostCardPreview() {
 private fun PostCardBlurredPreview() {
     FeedITTheme(dynamicColor = false) {
         PostCard(
-            post = Post(id = "p2", text = "exam stress is really getting to me this week"),
-            result = ClassificationResult(
+            post = FeedPost(
                 postId = "p2",
+                text = "exam stress is really getting to me this week",
+                imageUrl = "https://picsum.photos/400/300?random=2",
                 shouldBlur = true,
                 tags = listOf("toxic", "insult"),
                 wellbeingScore = -62.5,
@@ -224,9 +274,10 @@ private fun PostCardBlurredPreview() {
 private fun PostCardBlockedPreview() {
     FeedITTheme(dynamicColor = false) {
         PostCard(
-            post = Post(id = "p3", text = "IPL cricket match tonight was intense"),
-            result = ClassificationResult(
+            post = FeedPost(
                 postId = "p3",
+                text = "IPL cricket match tonight was intense",
+                imageUrl = null,
                 shouldBlur = true,
                 tags = listOf("user-blocked"),
                 wellbeingScore = null,

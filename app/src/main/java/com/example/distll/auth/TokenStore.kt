@@ -10,7 +10,7 @@ data class PlatformToken(
 class TokenStore {
     private val tokens = linkedMapOf(
         "reddit" to PlatformToken("reddit"),
-        "youtube" to PlatformToken("youtube"),
+        "instagram" to PlatformToken("instagram"),
     )
 
     fun isConnected(platform: String): Boolean = tokens[platform]?.connected == true

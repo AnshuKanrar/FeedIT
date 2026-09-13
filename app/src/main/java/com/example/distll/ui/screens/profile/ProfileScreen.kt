@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.distll.auth.PlatformToken
+import com.example.distll.auth.UserSession
 import com.example.feedit.ui.theme.FeedITTheme
 
 /** Pure view - reads ProfileViewModel's state and renders it. */
@@ -42,7 +43,7 @@ fun ProfileScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text("Profile", style = MaterialTheme.typography.headlineMedium)
-        Text("User ID: ${uiState.userId}", style = MaterialTheme.typography.bodyLarge)
+        Text(UserSession.displayName, style = MaterialTheme.typography.bodyLarge)
 
         Text("Connected accounts", style = MaterialTheme.typography.titleMedium)
         uiState.connectedPlatforms.forEach { platform ->
