@@ -1,43 +1,40 @@
 # Handoff - FeedIT
 
-> Updated 2026-09-13T05:51:35+05:30 by anshukanrar3021 (session 0912-2158, track 3)
+> Updated 2026-09-13T10:35:20+05:30 by anshukanrar3021 (session 0912-2158, track 3)
 > Read this first. The full log is cyhi-logs/session.md.
 
 ## Current state
-Backend (FastAPI, backend/main.py): three endpoints sharing one classify_one() helper - POST /classify, POST /feed (server-owned pagination over backend/dummy_posts.json, re-read fresh per request), GET /session/mood/{user_id}. scoring.py calls the real ML teammate's toxicity API (ngrok); that API has no joy/sadness so those are a clearly-marked placeholder derived from the harm score. dummy_posts.json holds the friend's real 500-post dataset (200 with real image_url values, 0 with audio).
-Android app: fully server-owned feed (zero hardcoded post content anywhere). New this session: a one-time LoginScreen is now the nav start destination - hardcoded FontFamily.Serif "FeedIT" wordmark, a name field that sets UserSession.displayName (shown on Profile instead of the raw backend userId), and two purely cosmetic "Connect" toggles (Reddit + Instagram, swapped from Reddit+YouTube - reuses MockAuthManager, no real OAuth). Continuing pops Login off the back stack for good and lands on Home; Scaffold's top/bottom bars are hidden while on the login route. PostCard renders images via Coil, blurs+hides them together with text when a post is flagged.
+Backend (FastAPI): four endpoints - POST /classify, POST /feed (server-owned pagination over dummy_posts.json), GET /session/mood/{user_id}, GET /session/attention/{user_id} (new this session - reels-scrolled-per-minute tracking, see attention_tracker.py). All four share state via classify_one() and per-user in-memory trackers. blur_threshold/similarity_threshold are now user-tunable end to end from the Android Settings screen through to content_blocking.is_blocked()/feed_logic.SessionTracker.
+Android: full MVVM, server-owned feed (zero hardcoded content), one-time persisted login (SharedPreferences), real Settings screen (blocked terms + 2 thresholds, persisted), Analysis screen now has BOTH a Mood card and an Attention card (bar chart of scrolls/min). Real 500-post dataset merged from teammate's branch (git push/pull done, clean merge). Docs: ARCHITECTURE.md (backend), APP_TECHNICAL_OVERVIEW.md (new - full Android technical writeup), README.md (new - short project overview), HANDOFF.md (this file).
 
 ## Works
-- /classify, /feed, /session/mood verified consistent together via direct Python calls with score_text mocked.
-- Full clean `./gradlew clean :app:assembleDebug` passes repeatedly, including checkDebugDuplicateClasses.
-- Real 500-post dataset parses correctly (caption/image_url/audio_url + integer id, normalized in main.py).
-- All screens have working @Preview functions with realistic sample data (no live server/ML API needed to sanity-check UI).
+- All 4 backend endpoints verified together via direct Python calls (score_text mocked) - no regressions across the classify_one() refactor.
+- Real ML API (ngrok) confirmed live and reachable multiple times this session.
+- Full clean `./gradlew clean :app:assembleDebug` passes repeatedly.
+- git push succeeded after a real branch divergence (teammate's dataset commits vs local feature work) - resolved via explicit merge, verified before pushing.
 
-## Broken
-- Caught and fixed a real regression THIS session: PostCard.kt's `import coil.compose.AsyncImage` had been replaced (by an external edit, not a request) with a local stub function doing `TODO()` - would have crashed instantly on any post with an image. Restored the real import. Worth double-checking PostCard.kt renders images correctly on next device test, since this was silently broken for at least one prior turn.
-- ML teammate's ngrok tunnel is down (502 Bad Gateway) - blocks real end-to-end testing, not our bug.
-- Still no confirmed successful on-device feed load this whole session - real bugs were found and fixed along the way (CLEARTEXT blocking, missing INTERNET permission, stale un-restarted backend, dataset field mismatch, the AsyncImage regression above) but nobody has reported an actual clean successful run yet.
-- Settings screen still a stub - blocked_terms has no real UI, always empty.
-- UserSession.displayName is NOT persisted (resets to "Guest" on process death) - intentional for now, "one-time login" was read as "once per app session," not "once ever." Revisit if they want it to survive restarts.
+## Broken / recurring issue
+- **PostCard.kt's `import coil.compose.AsyncImage` has been silently replaced with a broken `TODO()` stub THREE separate times this session** (each time fixed). Root cause unconfirmed - suspected Android Studio "create function" quick-fix being accepted when Coil's import shows temporarily unresolved before a Gradle sync completes. User was told: if AsyncImage shows unresolved in the IDE, do NOT accept an auto-generated stub - just wait for/trigger a Gradle sync. Worth checking this file first if images ever stop rendering again.
+- Still no confirmed clean successful on-device feed load reported back this session, despite many individual bugs being found and fixed (cleartext, INTERNET permission, stale server, dataset field mismatch, the AsyncImage regression x3, port-8000-already-in-use from duplicate uvicorn processes across terminal tabs, fresh-terminal-tab-missing-venv-activation).
+- User's dev workflow friction: multiple Android Studio terminal tabs, easy to lose track of which one has the venv activated / a server already running on port 8000. Recommend they stick to ONE terminal tab for the backend for the rest of the event.
 
 ## Next 3 things
-1. Get the ML API back up, then one real on-device pass: fresh install, restart backend, confirm feed loads with real photos+captions+scores AND the login screen appears first.
-2. Build a real Settings screen so blocked_terms comes from actual user input.
-3. Decide if UserSession.displayName should persist (SharedPreferences) across app restarts, or "one-time" truly just means once per session as currently built.
+1. Get a real confirmed successful on-device test end to end (feed loads, images render, blur/reveal works, Analysis shows both cards) - has not happened yet this whole session.
+2. Watch for the AsyncImage regression recurring a 4th time.
+3. Nothing else major outstanding - core feature set (feed, blocking, mood, attention, settings, login, profile) is functionally complete per repeated backend-side verification; remaining risk is entirely on-device/environment, not code logic.
 
 ## Decisions (and why)
-- joy/sadness placeholder formula: user's explicit pick among 3 presented options, since the real ML API has no emotion model.
-- dummy_posts.json stays a flat re-read-per-request file, not a DB - cheap at 500 entries, and the friend's git commits take effect with zero backend restart (only backend CODE changes need a restart).
-- /classify and /feed share one classify_one() helper so behavior can't drift between them.
-- Login screen wordmark uses FontFamily.Serif (a built-in system family) rather than a bundled custom font file, per "hardcode the font" - no font asset infrastructure exists in the project, and this satisfies "stylish" without adding one.
-- Reddit+Instagram (not Reddit+YouTube) per explicit correction mid-request; TokenStore/MockAuthManager/ARCHITECTURE.md all updated to match.
+- attention_tracker.py follows the exact same pattern as mood_predictor.py (per-user in-memory tracker, OLS trend slope, auto-fed from classify_one() with no extra round trip) for consistency.
+- Attention's trend color mapping is deliberately INVERTED from Mood's (rising scroll rate = bad/red, falling = good/green) since they measure opposite-direction concepts - documented in code comments so it isn't "fixed" to match Mood's mapping by mistake later.
+- Kept per-tab terminal/venv friction as a user workflow issue to flag, not something to solve in code (e.g. did not build a shell script wrapper) - out of scope, and the user has been managing it themselves each time.
 
 ## Don't retry
-- Don't add a second navigation-compose (or any) dependency under a different alias/version_ref without checking libs.versions.toml first - caused a real duplicate-classpath conflict (2.9.0 vs 2.10.1) that broke navigation at runtime.
-- Don't `import androidx.compose.foundation.layout.weight` as a top-level import here - collides with an internal RowColumnParentData.weight symbol, fails to compile. Call `.weight(...)` unqualified inside Row/Column scope.
-- Don't use `Icons.AutoMirrored.Filled.ArrowForward` / that import path here - unresolved in this project's material-icons-extended version. Use `Icons.Filled.ArrowForward` (deprecated but compiles).
-- Don't treat a clean compile/assembleDebug as proof of on-device behavior - confirm with an actual device/emulator when available.
-- Don't assume `uvicorn` picks up backend .py changes automatically - must be manually killed and restarted every time. Caused multiple "still broken" reports that were actually a stale server. Consider `--reload` for the rest of the event.
-- Don't assume a teammate's real dataset matches whatever field names placeholder code assumed - always check one real sample entry first.
-- When the ML API errors (502/timeout), it's a clean Python exception naming the failing URL - that means "check the other team's server," not a bug here.
-- Watch for external edits silently reverting working code to a broken stub (happened to PostCard.kt's AsyncImage import) - when a file changed-on-disk notice shows something that looks broken (a TODO(), a removed import), say so and verify before assuming it's intentional.
+(carried forward, still true)
+- Don't add a second navigation-compose (or any) dependency under a different alias/version_ref without checking libs.versions.toml first.
+- Don't `import androidx.compose.foundation.layout.weight` as a top-level import here - collides with an internal symbol, fails to compile.
+- Don't use `Icons.AutoMirrored.Filled.ArrowForward` here - unresolved in this project's material-icons-extended version. Use `Icons.Filled.ArrowForward`.
+- Don't treat a clean compile/assembleDebug as proof of on-device behavior.
+- Don't assume `uvicorn` picks up backend .py changes automatically without `--reload` and a restart.
+- Don't assume a teammate's real dataset matches whatever field names placeholder code assumed - check one real sample first.
+- NEW: Don't assume PostCard.kt's Coil import is intact just because it compiled recently - it has regressed 3 times. Spot-check it if images ever break again.
+- NEW: A curl to the user's LAN IP (e.g. 172.27.55.213) from this sandbox will always hang/fail - that address is only reachable from the user's own network, never from here. Don't waste time testing it; only the user can verify their own backend's live reachability.

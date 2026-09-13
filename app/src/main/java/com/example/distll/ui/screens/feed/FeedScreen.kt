@@ -1,5 +1,6 @@
 package com.example.distll.ui.screens.feed
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,8 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +36,7 @@ import com.example.distll.network.BackendApi
 import com.example.distll.network.ClassifyRequest
 import com.example.distll.network.FeedRequest
 import com.example.distll.ui.components.PostCard
+import com.example.feedit.ui.theme.LocalAppColors
 
 // How close to the bottom (in item count) we trigger the next page load.
 private const val LOAD_MORE_THRESHOLD = 3
@@ -60,6 +67,13 @@ fun FeedScreen(
             }
     }
 
+    if (uiState.showSadModePrompt) {
+        SadModeDialog(
+            onConfirm = { viewModel.enableHappyMode() },
+            onDismiss = { viewModel.dismissSadModePrompt() },
+        )
+    }
+
     when {
         uiState.loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -74,6 +88,23 @@ fun FeedScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (uiState.happyModeEnabled) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(LocalAppColors.current.wellbeingPositive.copy(alpha = 0.15f))
+                            .padding(12.dp),
+                    ) {
+                        Text(
+                            "Happy Mode is on - negative posts are filtered out",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = LocalAppColors.current.wellbeingPositive,
+                        )
+                    }
+                }
+            }
             items(uiState.posts, key = { it.postId }) { post ->
                 PostCard(post = post)
             }
@@ -86,6 +117,21 @@ fun FeedScreen(
             }
         }
     }
+}
+
+@Composable
+private fun SadModeDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Your feed is looking a little heavy") },
+        text = { Text("Want to turn on Happy Mode? We'll filter out negative and toxic posts from your feed.") },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text("Turn on Happy Mode") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Not now") }
+        },
+    )
 }
 
 // Canned BackendApi so the preview renders without a real network call.
@@ -188,4 +234,10 @@ private class PreviewBackendApi : BackendApi {
 private fun FeedScreenPreview() {
     val previewViewModel = remember { FeedViewModel(repository = FeedRepository(api = PreviewBackendApi())) }
     FeedScreen(userId = "preview-user", viewModel = previewViewModel)
+}
+
+@Preview(showBackground = true, name = "Sad mode prompt")
+@Composable
+private fun SadModeDialogPreview() {
+    SadModeDialog(onConfirm = {}, onDismiss = {})
 }
