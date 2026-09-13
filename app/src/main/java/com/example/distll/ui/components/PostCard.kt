@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
@@ -132,6 +131,16 @@ fun PostCard(
             PostActionsRow(modifier = Modifier.padding(top = 12.dp))
         }
     }
+}
+
+@Composable
+fun AsyncImage(
+    model: String,
+    contentDescription: Nothing?,
+    contentScale: ContentScale,
+    modifier: Modifier
+) {
+    TODO("Not yet implemented")
 }
 
 // Guaranteed-to-hide stand-in for real text: a couple of muted bars, the

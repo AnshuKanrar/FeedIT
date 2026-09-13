@@ -1,11 +1,13 @@
 """
-FastAPI server exposing POST /classify, POST /feed, and GET /session/mood/{user_id}.
+FastAPI server exposing POST /classify, POST /feed, GET /session/mood/{user_id},
+and GET /session/attention/{user_id}.
 
 Wires together the real pipeline pieces:
-  - ml_files/content_blocking.py  -> is_blocked()      (user-curated blocking)
-  - scoring.py                    -> score_text()      (real ML API call)
-  - ml_files/feed_logic.py        -> SessionTracker     (blur/tags/wellbeing)
-  - ml_files/mood_predictor.py    -> MoodSession        (session mood / Analysis screen)
+  - ml_files/content_blocking.py  -> is_blocked()        (user-curated blocking)
+  - scoring.py                    -> score_text()        (real ML API call)
+  - ml_files/feed_logic.py        -> SessionTracker       (blur/tags/wellbeing)
+  - ml_files/mood_predictor.py    -> MoodSession          (session mood / Analysis screen)
+  - ml_files/attention_tracker.py -> AttentionTracker     (scroll rate / Analysis screen)
 """
 
 import json
@@ -15,10 +17,12 @@ from typing import Dict, List
 from fastapi import FastAPI
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+from ml_files.attention_tracker import AttentionTracker
 from ml_files.content_blocking import is_blocked
 from ml_files.feed_logic import SessionTracker
 from ml_files.mood_predictor import MoodSession, RunningStats
 from models import (
+    AttentionResponse,
     ClassifyRequest,
     ClassifyResult,
     FeedPost,
@@ -32,12 +36,14 @@ app = FastAPI()
 
 DUMMY_POSTS_PATH = Path(__file__).parent / "dummy_posts.json"
 
-# One SessionTracker/MoodSession/RunningStats per user_id, kept in memory for
-# the life of the process. Lost on restart - fine for the demo; would need a
-# real store (redis/db) once this needs to survive across server restarts.
+# One SessionTracker/MoodSession/RunningStats/AttentionTracker per user_id,
+# kept in memory for the life of the process. Lost on restart - fine for
+# the demo; would need a real store (redis/db) once this needs to survive
+# across server restarts.
 session_trackers: Dict[str, SessionTracker] = {}
 mood_sessions: Dict[str, MoodSession] = {}
 mood_baselines: Dict[str, RunningStats] = {}
+attention_trackers: Dict[str, AttentionTracker] = {}
 
 
 def get_tracker(user_id: str) -> SessionTracker:
@@ -56,6 +62,12 @@ def get_mood_baseline(user_id: str) -> RunningStats:
     if user_id not in mood_baselines:
         mood_baselines[user_id] = RunningStats()
     return mood_baselines[user_id]
+
+
+def get_attention_tracker(user_id: str) -> AttentionTracker:
+    if user_id not in attention_trackers:
+        attention_trackers[user_id] = AttentionTracker()
+    return attention_trackers[user_id]
 
 
 def load_dummy_posts() -> List[dict]:
@@ -89,6 +101,11 @@ def classify_one(
     both content_blocking.is_blocked() and feed_logic.SessionTracker already
     accept/expose these as parameters, so no logic there needed to change.
     """
+    # Every post handed to classify_one() is a post the user scrolled to -
+    # log it regardless of whether it ends up blocked, so "reels scrolled"
+    # counts everything actually seen, not just the ones that got scored.
+    get_attention_tracker(user_id).log_scroll()
+
     block_result = is_blocked(text, blocked_terms, vectorizer, similarity_threshold=similarity_threshold)
 
     if block_result["blocked"]:
@@ -190,6 +207,11 @@ def get_mood(user_id: str):
     result = session.predict(baseline)
     baseline.update(result["valence"])
     return result
+
+
+@app.get("/session/attention/{user_id}", response_model=AttentionResponse)
+def get_attention(user_id: str):
+    return get_attention_tracker(user_id).summary()
 
 
 if __name__ == "__main__":

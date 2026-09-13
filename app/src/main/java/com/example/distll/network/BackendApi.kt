@@ -1,5 +1,6 @@
 package com.example.distll.network
 
+import com.example.distll.data.model.AttentionResponse
 import com.example.distll.data.model.ClassificationResult
 import com.example.distll.data.model.FeedResponse
 import com.example.distll.data.model.MoodResponse
@@ -53,4 +54,7 @@ interface BackendApi {
 
     @GET("session/mood/{userId}")
     suspend fun getMood(@Path("userId") userId: String): MoodResponse
+
+    @GET("session/attention/{userId}")
+    suspend fun getAttention(@Path("userId") userId: String): AttentionResponse
 }

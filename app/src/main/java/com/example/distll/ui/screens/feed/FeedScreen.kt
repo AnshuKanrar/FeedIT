@@ -173,6 +173,14 @@ private class PreviewBackendApi : BackendApi {
         sessionMinutes = 0.0,
         history = emptyList(),
     )
+
+    override suspend fun getAttention(userId: String) = com.example.distll.data.model.AttentionResponse(
+        scrollsLastMinute = 0,
+        avgScrollsPerMinute = 0.0,
+        sessionMinutes = 0.0,
+        trend = "stable",
+        perMinuteCounts = emptyList(),
+    )
 }
 
 @Preview(showBackground = true)

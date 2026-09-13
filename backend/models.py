@@ -64,3 +64,16 @@ class FeedPost(BaseModel):
 class FeedResponse(BaseModel):
     posts: List[FeedPost]
     has_more: bool
+
+
+class AttentionMinutePoint(BaseModel):
+    minute: int
+    count: int
+
+
+class AttentionResponse(BaseModel):
+    scrolls_last_minute: int
+    avg_scrolls_per_minute: float
+    session_minutes: float
+    trend: str
+    per_minute_counts: List[AttentionMinutePoint]

@@ -59,8 +59,7 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        // Hardcoded stylish wordmark - a serif family, distinct from the
-        // rest of the app's sans-serif type scale, used only here.
+
         Text(
             text = "FeedIT",
             fontFamily = FontFamily.Serif,
